@@ -5,7 +5,7 @@ import tensorflow as tf
 import keras.backend.tensorflow_backend as KTF
 import numpy as np
 import util.Generator as Generator
-import model.Transformer as Transformer
+import model.PLANBERT as PLANBERT
 from util.Datahelper import UNIVERSITY1_load_data, SYSTEM1_load_data, list_partition, list_sampling, list_padding, mat_partition, mat_sampling, mat_padding, set_top_n, list2mat
 
 #id = int(sys.argv[1])
@@ -88,14 +88,14 @@ model_config = {
     'num_layers' : num_layers,
     'num_heads' : 8,
     
-    'transformer_dropout' : 0.2,
+    'PLANBERT_dropout' : 0.2,
     'embedding_dropout' : 0.2,
     
     'l2_reg_penalty_weight' : 0,
     'confidence_penalty_weight' : 0.1,
     'lrate' : 1e-4}
 
-model = Transformer.Transformer(model_config)
+model = PLANBERT.PLANBERT(model_config)
 
 if use_ref:
     # Pretraining : Course-level Masking
