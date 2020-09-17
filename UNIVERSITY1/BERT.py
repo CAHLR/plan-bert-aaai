@@ -5,7 +5,7 @@ import tensorflow as tf
 import keras.backend.tensorflow_backend as KTF
 import numpy as np
 import util.Generator as Generator
-import model.PLANBERT as PLANBERT
+import model.BERT as BERT
 from util.Datahelper import UNIVERSITY1_load_data, SYSTEM1_load_data, list_partition, list_sampling, list_padding, mat_partition, mat_sampling, mat_padding, set_top_n, list2mat
 
 #id = int(sys.argv[1])
@@ -62,7 +62,7 @@ tv_keys.sort()
 train_keys, valid_keys = list_partition(tv_keys, 0.8, seed=0)
 
 model_config = {
-    'name' : 'PLAN-BERT',
+    'name' : 'BERT',
     'mask_future' : False,
     'num_sem' : basic_config['num_sem'], 
     'num_times' : 0,
@@ -70,19 +70,6 @@ model_config = {
     'num_input_1' : [True, basic_config['num_sem'], 'RelativeSemester'],
     'num_input_2' : [True, 3, 'Season'],
     'num_input_3' : [True, 1, 'PredictToken'],
-    # [whether the feature is used, the dimension of the feature, the name of feature]
-    'num_stu_feat_list' : [
-        [use_user, basic_config['stu_features'][0], 'StudentsCollege'],
-        [use_user, basic_config['stu_features'][1], 'StudentsDivision'],
-        [use_user, basic_config['stu_features'][2], 'StudentsDepartment'],
-        [use_user, basic_config['stu_features'][3], 'StudentsMajor']
-    ],
-    'num_crs_feat_list' : [
-        [use_item, basic_config['crs_features'][0], 'CoursesDepartment'],
-        [use_item, basic_config['crs_features'][1], 'CoursesSubject'],
-        [False, basic_config['crs_features'][2], 'CoursesInstructor'],
-        [False,basic_config['crs_features'][3], 'CoursesDescription']
-    ],
     
     'embedding_dim' : 2**num_hidden_dims,
     'num_layers' : num_layers,
@@ -95,39 +82,7 @@ model_config = {
     'confidence_penalty_weight' : 0.1,
     'lrate' : 1e-4}
 
-model = PLANBERT.PLANBERT(model_config)
-
-if use_ref:
-    # Pretraining : Course-level Masking
-    train_generator_config = {
-        'name' : None,
-        'training' : True, 
-        'stu_type' : 'ALL', 
-        'num_courses_window' : [10, np.inf], 
-        'use_same' : False, # X0 == Y.
-        'use_sampling' : True, # Sample a number or precentage of courses as input.
-        'sampling_level' : 'course',
-        'sampling_num_rate' : [mask_rate],
-        'sampling_window' : [0, basic_config['num_sem']],
-        'use_history' : False, # Use first several semester as input.
-        'history_num' : 0,
-        'num_times' : 0,
-        'predict_future' : False, 
-        'batch_size' : basic_config['batch_size'],
-        'shuffle' : True,
-        'fixed_seed' : False}
-    train_generator = Generator.UNIVERSITY1MultihotGenerator(stu_dict, train_keys, basic_config, train_generator_config)
-    valid_generator = Generator.UNIVERSITY1MultihotGenerator(stu_dict, valid_keys, basic_config, train_generator_config)
-
-    Engine.fit(
-        model=model, 
-        train_generator=train_generator, 
-        valid_generator=valid_generator, 
-        epoch_limit=200, 
-        loss_nonimprove_limit=loss_nonimprove_limit,
-        batch_size=basic_config['batch_size'], 
-        use_cosine_lr=True, 
-        model_save_path=None)
+model = BERT.BERT(model_config)
 
 # Fine-tune
 train_generator_config = {
