@@ -69,11 +69,11 @@ tv_keys, test_keys = basic_config['load'](stu_dict, basic_config['test_sem'])
 tv_keys.sort()
 train_keys, valid_keys = list_partition(tv_keys, 0.8, seed=0)
 
-import model.PLANBERT as PLANBERT
-importlib.reload(PLANBERT)
+import model.BERT as BERT
+importlib.reload(BERT)
 
 model_config = {
-    'name' : 'PLAN-BERT',
+    'name' : 'BERT',
     'mask_future' : False,
     'num_sem' : basic_config['num_sem'], 
     'num_times' : 0,
@@ -81,17 +81,6 @@ model_config = {
     'num_input_1' : [True, basic_config['num_sem'], 'RelativeSemester'],
     'num_input_2' : [True, 3, 'Season'],
     'num_input_3' : [True, 1, 'PredictToken'],
-    # [whether the feature is used, the dimension of the feature, the name of feature]
-    'num_stu_feat_list' : [
-        [False, basic_config['stu_features'][0], 'StudentsDegree'],
-        [False, basic_config['stu_features'][1], 'StudentsMajor'],
-    ],
-    'num_crs_feat_list' : [
-        [False, basic_config['crs_features'][0], 'CoursesSubjects'],
-        [False, basic_config['crs_features'][1], 'CoursesComponents'],
-        [False, basic_config['crs_features'][2], 'CoursesDepartment'],
-        [False, basic_config['crs_features'][3], 'CoursesSchool'],
-    ],
     
     'embedding_dim' : 2**9,
     'num_layers' : 3,
@@ -104,7 +93,7 @@ model_config = {
     'confidence_penalty_weight' : 0.1,
     'lrate' : 1e-4}
 
-model = PLANBERT.PLANBERT(model_config)
+model = BERT.BERT(model_config)
 
 # Fine-tune
 train_generator_config = {
